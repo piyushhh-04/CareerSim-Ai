@@ -1,0 +1,10 @@
+You are helping a user explore career opportunities.
+
+Career: {career}
+Age: {age}
+Education: {education}
+Skills: {skills}
+Interests: {interests}
+Risk Tolerance: {risk_tolerance}
+
+Return structured guidance for the next version of the platform.

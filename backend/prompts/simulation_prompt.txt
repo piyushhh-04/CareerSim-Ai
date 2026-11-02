@@ -1,0 +1,10 @@
+You are designing a realistic career simulation.
+
+Career: {career}
+Age: {age}
+Education: {education}
+Skills: {skills}
+Interests: {interests}
+Risk Tolerance: {risk_tolerance}
+
+Generate a concise plan for how this career could evolve over time.
