@@ -679,12 +679,18 @@ function normalizeApiSimulation(response, careerName, onboardingData) {
     cons: normalizeList(decision.cons, ["Requires thoughtful trade-offs"]),
     impact: decision.impact || "This choice can influence your long-term trajectory.",
   }));
-  const insightItems = response.insights || [];
+  const insightItems = normalizeList(response.insights, []);
+  const fallbackInsights = {
+    strengths: ["Your profile supports steady growth in this career path."],
+    weaknesses: ["This path requires continuous skill development and adaptation."],
+    risks: ["Market conditions and role expectations can change over time."],
+    opportunities: ["Build specialized expertise and practical experience to expand your options."],
+  };
   const insights = {
-    strengths: insightItems.slice(0, 2),
-    weaknesses: insightItems.slice(2, 3),
-    risks: insightItems.slice(3, 4),
-    opportunities: insightItems.slice(4),
+    strengths: insightItems.slice(0, 2).length ? insightItems.slice(0, 2) : fallbackInsights.strengths,
+    weaknesses: insightItems.slice(2, 3).length ? insightItems.slice(2, 3) : fallbackInsights.weaknesses,
+    risks: insightItems.slice(3, 4).length ? insightItems.slice(3, 4) : fallbackInsights.risks,
+    opportunities: insightItems.slice(4).length ? insightItems.slice(4) : fallbackInsights.opportunities,
   };
 
   return {
