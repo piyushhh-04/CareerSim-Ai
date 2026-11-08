@@ -10,8 +10,8 @@ export default function Charts({ data }) {
             <AreaChart data={data}>
               <CartesianGrid stroke="rgba(120, 104, 91, 0.18)" />
               <XAxis dataKey="name" tick={{ fill: "#6b625b", fontSize: 12 }} />
-              <YAxis tick={{ fill: "#6b625b", fontSize: 12 }} />
-              <Tooltip />
+              <YAxis tick={{ fill: "#6b625b", fontSize: 12 }} tickFormatter={(value) => `$${value}k`} />
+              <Tooltip formatter={(value) => [`$${value}k`, "Salary"]} />
               <Area type="monotone" dataKey="salary" stroke="#c7774b" fill="#c7774b" fillOpacity={0.2} />
             </AreaChart>
           </ResponsiveContainer>

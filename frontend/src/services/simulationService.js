@@ -626,11 +626,19 @@ function getProfile(name) {
 function buildChartData(timeline) {
   return timeline.map((item) => ({
     name: `${item.years}Y`,
-    salary: Number(item.salary.replace(/[^\d]/g, "")) / 1000,
+    salary: parseSalaryRange(item.salary),
     stress: item.stress,
     balance: item.workLifeBalance,
     demand: item.demand === "Very High" ? 5 : item.demand === "High" ? 4 : 3,
   }));
+}
+
+function parseSalaryRange(salary) {
+  const amounts = String(salary).match(/\d+(?:,\d{3})*(?:\.\d+)?/g)?.map((amount) => Number(amount.replace(/,/g, ""))) || [];
+  if (!amounts.length) return 0;
+
+  const midpoint = amounts.length > 1 ? (amounts[0] + amounts[1]) / 2 : amounts[0];
+  return Math.round(midpoint >= 1000 ? midpoint / 1000 : midpoint);
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
