@@ -219,7 +219,7 @@ export default function Compare() {
                         <td className="rounded-l-2xl px-4 py-4 text-sm font-semibold text-[#352f2a]">Work-Life Balance</td>
                         {compareData.careers.map((career) => (
                           <td key={career.career} className="px-4 py-4 text-center text-sm font-semibold">
-                            <span className={getBalanceColor(career.balance)}>{career.balance ? `${career.balance}/10` : '—'}</span>
+                            <span className={getBalanceColor(career.workLifeBalance)}>{career.workLifeBalance ? `${career.workLifeBalance}/10` : '—'}</span>
                           </td>
                         ))}
                       </tr>
@@ -228,7 +228,7 @@ export default function Compare() {
                         <td className="rounded-l-2xl px-4 py-4 text-sm font-semibold text-[#352f2a]">Market Demand</td>
                         {compareData.careers.map((career) => (
                           <td key={career.career} className="px-4 py-4 text-center text-sm font-semibold text-[#486b8c]">
-                            {career.demand || '—'}
+                            {career.marketDemand || '—'}
                           </td>
                         ))}
                       </tr>

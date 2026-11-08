@@ -635,6 +635,31 @@ function buildChartData(timeline) {
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
+function formatApiError(detail, status) {
+  if (typeof detail === "string" && detail.trim()) return detail;
+  if (Array.isArray(detail)) {
+    const messages = detail.map((item) => {
+      if (typeof item === "string") return item;
+      if (item?.msg && Array.isArray(item.loc)) {
+        return `${item.loc.at(-1)}: ${item.msg}`;
+      }
+      return item?.msg || "The server rejected the simulation request.";
+    });
+    return messages.join(" ");
+  }
+  if (detail && typeof detail === "object" && detail.msg) return detail.msg;
+  return `Simulation request failed (${status}).`;
+}
+
+function normalizeList(value, fallback) {
+  if (Array.isArray(value)) {
+    const items = value.filter((item) => item !== null && item !== undefined).map(String);
+    return items.length ? items : fallback;
+  }
+  if (typeof value === "string" && value.trim()) return [value.trim()];
+  return fallback;
+}
+
 function normalizeApiSimulation(response, careerName, onboardingData) {
   const timeline = Object.entries(response.timeline).map(([label, item]) => ({
     years: Number.parseInt(label, 10) || 0,
@@ -650,8 +675,8 @@ function normalizeApiSimulation(response, careerName, onboardingData) {
   const decisions = response.decisionPoints.map((decision) => ({
     years: decision.years ?? decision.year ?? 0,
     title: decision.title || "Career decision",
-    pros: decision.pros || ["Potential for meaningful growth"],
-    cons: decision.cons || ["Requires thoughtful trade-offs"],
+    pros: normalizeList(decision.pros, ["Potential for meaningful growth"]),
+    cons: normalizeList(decision.cons, ["Requires thoughtful trade-offs"]),
     impact: decision.impact || "This choice can influence your long-term trajectory.",
   }));
   const insightItems = response.insights || [];
@@ -697,7 +722,7 @@ export async function generateSimulationFromApi(careerName, onboardingData = {},
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body.detail || `Simulation request failed (${response.status}).`);
+    throw new Error(formatApiError(body.detail, response.status));
   }
 
   return normalizeApiSimulation(await response.json(), careerName, onboardingData);

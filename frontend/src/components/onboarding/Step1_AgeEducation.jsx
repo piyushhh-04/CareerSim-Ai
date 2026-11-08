@@ -27,15 +27,15 @@ export default function Step1_AgeEducation() {
         </label>
         <input
           type="number"
-          min="15"
+          min="16"
           max="70"
           value={data.age || ""}
           onChange={(e) => updateData("age", e.target.value ? Number(e.target.value) : null)}
-          placeholder="Enter your age (15-70)"
+          placeholder="Enter your age (16-70)"
           className="w-full rounded-xl border border-[#e7dccd] bg-[#f5efe7] px-4 py-3 text-[#1f1b18] placeholder-[#7b6b60] outline-none transition-colors focus:border-[#c7774b]"
         />
-        {data.age && (data.age < 15 || data.age > 70) && (
-          <p className="text-xs text-[#b9544f]">Age must be between 15 and 70</p>
+        {data.age && (data.age < 16 || data.age > 70) && (
+          <p className="text-xs text-[#b9544f]">Age must be between 16 and 70</p>
         )}
       </div>
 

@@ -24,16 +24,31 @@ class SimulationRequest(BaseModel):
     def validate_education(cls, value: str) -> str:
         allowed_values = {
             "high school": "High School",
+            "diploma": "Diploma",
             "bachelors": "Bachelor's",
             "bachelor's": "Bachelor's",
             "master's": "Master's",
             "masters": "Master's",
             "phd": "PhD",
             "vocational": "Vocational",
+            "other": "Other",
         }
         normalized = " ".join(value.split()).lower()
         if normalized not in allowed_values:
-            raise ValueError("education must be one of: High School, Bachelor's, Master's, PhD, Vocational")
+            raise ValueError("education must be one of: High School, Diploma, Bachelor's, Master's, PhD, Vocational, Other")
+        return allowed_values[normalized]
+
+    @field_validator("riskTolerance", mode="before")
+    @classmethod
+    def normalize_risk_tolerance(cls, value: str) -> str:
+        normalized = str(value).strip().lower()
+        allowed_values = {
+            "low": "Low",
+            "medium": "Medium",
+            "high": "High",
+        }
+        if normalized not in allowed_values:
+            raise ValueError("riskTolerance must be Low, Medium, or High")
         return allowed_values[normalized]
 
     @field_validator("skills", "interests")

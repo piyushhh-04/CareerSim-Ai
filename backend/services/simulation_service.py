@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from backend.services.ai_service import AIService
+from backend.services.ai_service import AIService, GeminiServiceError
 from backend.schemas.simulation import CompareRequest, CompareResponse, ComparisonCareer, SimulationRequest, SimulationResponse
 
 
@@ -578,7 +578,11 @@ class SimulationService:
         """Generate a Gemini simulation when configured, otherwise use local profiles."""
 
         if self.ai_service.is_configured():
-            return self.ai_service.generate_simulation(payload)
+            try:
+                return self.ai_service.generate_simulation(payload)
+            except GeminiServiceError:
+                # Keep the product usable when the provider is unavailable or rate-limited.
+                pass
 
         profile = self._career_profiles.get(payload.career)
         if profile is None:

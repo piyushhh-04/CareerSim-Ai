@@ -16,7 +16,7 @@ function OnboardingContent() {
   const { data } = useOnboarding();
   const [currentStep, setCurrentStep] = useState(1);
 
-  const isStep1Valid = () => data.age && data.education && data.age >= 15 && data.age <= 70;
+  const isStep1Valid = () => data.age && data.education && data.age >= 16 && data.age <= 70;
   const isStep2Valid = () => data.skills.length > 0;
   const isStep3Valid = () => data.interests.length > 0;
   const isStep4Valid = () => data.riskTolerance !== "";
