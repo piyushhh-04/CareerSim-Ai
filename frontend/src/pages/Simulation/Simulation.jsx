@@ -1,11 +1,11 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MainLayout from "../../layouts/MainLayout";
 import CareerOverview from "../../components/simulation/CareerOverview";
 import TimelineCard from "../../components/simulation/TimelineCard";
 import DecisionCard from "../../components/simulation/DecisionCard";
 import Charts from "../../components/simulation/Charts";
 import Insights from "../../components/simulation/Insights";
-import { generateSimulation } from "../../services/simulationService";
+import { generateSimulationFromApi } from "../../services/simulationService";
 
 const STORAGE_KEY = "careersim.selectedCareer";
 
@@ -21,7 +21,47 @@ export default function Simulation() {
     return raw ? JSON.parse(raw) : {};
   }, []);
 
-  const simulation = useMemo(() => generateSimulation(careerName, onboardingData), [careerName, onboardingData]);
+  const [simulation, setSimulation] = useState(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const controller = new AbortController();
+    generateSimulationFromApi(careerName, onboardingData, controller.signal)
+      .then((result) => {
+        setError("");
+        setSimulation(result);
+      })
+      .catch((requestError) => {
+        if (requestError.name !== "AbortError") {
+          setError(requestError.message);
+        }
+      });
+    return () => controller.abort();
+  }, [careerName, onboardingData]);
+
+  if (error) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-screen items-center justify-center bg-[#f5f0e8] px-6 text-center text-[#1f1b18]">
+          <div className="max-w-xl rounded-[2rem] border border-[#f0cbd0] bg-[#fffaf4] p-8 shadow-[0_18px_40px_rgba(93,86,79,0.08)]">
+            <h1 className="text-2xl font-semibold">Unable to generate your simulation</h1>
+            <p className="mt-3 text-[#5d564f]">{error}</p>
+            <p className="mt-4 text-sm text-[#7b6b60]">Confirm the backend is running and Gemini is configured, then try again.</p>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (!simulation) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-screen items-center justify-center bg-[#f5f0e8] px-6 text-center text-[#1f1b18]">
+          <p className="text-lg text-[#5d564f]">Generating your personalized simulation...</p>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

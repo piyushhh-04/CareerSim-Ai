@@ -633,6 +633,76 @@ function buildChartData(timeline) {
   }));
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+function normalizeApiSimulation(response, careerName, onboardingData) {
+  const timeline = Object.entries(response.timeline).map(([label, item]) => ({
+    years: Number.parseInt(label, 10) || 0,
+    title: item.title,
+    salary: item.salary,
+    skills: item.skills,
+    requiredSkills: item.skills.join(", "),
+    workLifeBalance: item.workLifeBalance,
+    stress: item.stress,
+    demand: item.marketDemand,
+    explanation: item.explanation,
+  }));
+  const decisions = response.decisionPoints.map((decision) => ({
+    years: decision.years ?? decision.year ?? 0,
+    title: decision.title || "Career decision",
+    pros: decision.pros || ["Potential for meaningful growth"],
+    cons: decision.cons || ["Requires thoughtful trade-offs"],
+    impact: decision.impact || "This choice can influence your long-term trajectory.",
+  }));
+  const insightItems = response.insights || [];
+  const insights = {
+    strengths: insightItems.slice(0, 2),
+    weaknesses: insightItems.slice(2, 3),
+    risks: insightItems.slice(3, 4),
+    opportunities: insightItems.slice(4),
+  };
+
+  return {
+    overview: {
+      careerName: response.career || careerName,
+      summary: `A Gemini-generated career outlook for ${response.career || careerName}.`,
+      confidenceScore: response.confidence,
+      estimatedAccuracy: Math.max(response.confidence - 4, 60),
+      disclaimer: "This AI-generated forecast is directional and is not financial or employment advice.",
+      profileSummary: onboardingData?.skills?.length
+        ? `Personalized using your ${onboardingData.skills.length} skills, ${onboardingData.interests?.length || 0} interests, and risk tolerance.`
+        : "This simulation reflects the information provided during onboarding.",
+    },
+    timeline,
+    decisions,
+    chartData: buildChartData(timeline),
+    insights,
+  };
+}
+
+export async function generateSimulationFromApi(careerName, onboardingData = {}, signal) {
+  const response = await fetch(`${API_BASE_URL}/simulate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    signal,
+    body: JSON.stringify({
+      career: careerName,
+      age: Number(onboardingData.age),
+      education: onboardingData.education,
+      skills: onboardingData.skills,
+      interests: onboardingData.interests,
+      riskTolerance: onboardingData.riskTolerance,
+    }),
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.detail || `Simulation request failed (${response.status}).`);
+  }
+
+  return normalizeApiSimulation(await response.json(), careerName, onboardingData);
+}
+
 export function generateSimulation(careerName, onboardingData = {}) {
   const profile = getProfile(careerName);
   const timeline = profile.timeline.map((item) => ({

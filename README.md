@@ -101,7 +101,9 @@ Copy `.env.example` to `.env` when environment configuration is needed:
 cp .env.example .env
 ```
 
-`GROQ_API_KEY` is reserved for the planned Groq/OpenAI-compatible AI integration. It is not required for the current deterministic simulation experience.
+`GEMINI_API_KEY` enables Gemini-powered simulation generation. `GEMINI_MODEL` defaults to `gemini-2.5-flash` and can be changed when a different supported Gemini model is preferred.
+
+The API key is loaded only by the backend. Never place it in frontend environment variables, commit it to Git, or expose it in browser code.
 
 ## API overview
 
@@ -111,6 +113,8 @@ cp .env.example .env
 | `GET` | `/careers` | List supported career options |
 | `POST` | `/simulate` | Generate a career simulation |
 | `POST` | `/compare` | Compare selected careers |
+
+When `GEMINI_API_KEY` is configured, `/simulate` generates a structured personalized response with Gemini and validates it against the backend schema. Without a key, predefined careers use the repository's deterministic profiles.
 
 ## Frontend commands
 

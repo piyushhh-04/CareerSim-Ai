@@ -48,8 +48,8 @@ class SimulationRequest(BaseModel):
     @classmethod
     def validate_career(cls, value: str) -> str:
         normalized = " ".join(value.split())
-        if normalized not in DEFAULT_CAREERS:
-            raise ValueError("career must be one of the predefined options")
+        if not normalized:
+            raise ValueError("career must not be empty")
         return normalized
 
 

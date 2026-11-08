@@ -14,7 +14,8 @@ class Settings:
     """Application settings loaded from environment variables."""
 
     def __init__(self) -> None:
-        self.groq_api_key: str | None = os.getenv("GROQ_API_KEY")
+        self.gemini_api_key: str | None = os.getenv("GEMINI_API_KEY")
+        self.gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         self.port: int = int(os.getenv("PORT", "8000"))
 
 

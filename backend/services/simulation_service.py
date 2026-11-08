@@ -2,13 +2,15 @@ from __future__ import annotations
 
 from typing import Any
 
+from backend.services.ai_service import AIService
 from backend.schemas.simulation import CompareRequest, CompareResponse, ComparisonCareer, SimulationRequest, SimulationResponse
 
 
 class SimulationService:
     """Service layer for deterministic mock career simulations and comparisons."""
 
-    def __init__(self) -> None:
+    def __init__(self, ai_service: AIService | None = None) -> None:
+        self.ai_service = ai_service or AIService()
         self._career_profiles: dict[str, dict[str, Any]] = {
             "Software Engineer": {
                 "confidence": 92,
@@ -573,7 +575,10 @@ class SimulationService:
         }
 
     def simulate(self, payload: SimulationRequest) -> SimulationResponse:
-        """Generate a deterministic simulation response based on the requested career."""
+        """Generate a Gemini simulation when configured, otherwise use local profiles."""
+
+        if self.ai_service.is_configured():
+            return self.ai_service.generate_simulation(payload)
 
         profile = self._career_profiles.get(payload.career)
         if profile is None:
